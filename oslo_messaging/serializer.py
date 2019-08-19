@@ -45,7 +45,7 @@ class Serializer(object):
         """
 
     @abc.abstractmethod
-    def serialize_context(self, ctxt):
+    def serialize_context(self, ctxt, asynch=False):
         """Serialize a request context into a dictionary.
 
         :param ctxt: Request context
@@ -70,7 +70,7 @@ class NoOpSerializer(Serializer):
     def deserialize_entity(self, ctxt, entity):
         return entity
 
-    def serialize_context(self, ctxt):
+    def serialize_context(self, ctxt, asynch=False):
         return ctxt
 
     def deserialize_context(self, ctxt):

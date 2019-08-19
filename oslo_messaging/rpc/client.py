@@ -22,6 +22,8 @@ import logging
 from oslo_config import cfg
 import six
 
+from osprofiler import profiler
+
 from oslo_messaging._drivers import base as driver_base
 from oslo_messaging import _utils as utils
 from oslo_messaging import exceptions
@@ -145,7 +147,10 @@ class _BaseCallContext(object):
     def cast(self, ctxt, method, **kwargs):
         """Invoke a method and return immediately. See RPCClient.cast()."""
         msg = self._make_message(ctxt, method, kwargs)
-        msg_ctxt = self.serializer.serialize_context(ctxt)
+        try:
+            msg_ctxt = self.serializer.serialize_context(ctxt, asynch=True)
+        except TypeError:
+            msg_ctxt = self.serializer.serialize_context(ctxt)
 
         self._check_version_cap(msg.get('version'))
 
@@ -161,7 +166,10 @@ class _BaseCallContext(object):
                                            self.target)
 
         msg = self._make_message(ctxt, method, kwargs)
-        msg_ctxt = self.serializer.serialize_context(ctxt)
+        try:
+            msg_ctxt = self.serializer.serialize_context(ctxt, asynch=False)
+        except TypeError:
+            msg_ctxt = self.serializer.serialize_context(ctxt)
 
         timeout = self.timeout
         if self.timeout is None:
